@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<link rel="stylesheet" href="lol.css">
+    <head>
+    <style>
+     
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD</title>
+</head>
+<body>
+
+    
+<style>
+    .navbar-nav .nav-link {
+transition: color 0.3s; /* Transição suave da cor */
+}
+
+.navbar-nav .nav-link:hover {
+border-bottom: 2px solid black;
+}
+.cor-card{
+background-color: black;
+}
+.botao-cor{
+background-color: black;
+}
+</style>
+<header>
+
+    <nav class="navbar navbar-expand-lg shadow p-3">
+        <div class="container-fluid">
+      <a class="navbar-brand " href="#">rp advogacia</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse d-flex justify-content-center align-items-center" id="navbarNav">
+        <ul class="navbar-nav  d-flex justify-content-center align-items-center ">
+            <li class="nav-item  ">
+                <a class="nav-link active " aria-current="page" href="index-clientes.php">clientes</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link active" href="index-reunião.html">reuniões</a>
+            </li>
+          <li class="nav-item ">
+            <a class="nav-link active" href="index-processo.php">Processos</a>
+        </li>   
+    </ul>
+</div>
+</div>
+</nav>
+</header>
+          </form>
+        </div>
+      </nav><br><br>
+      
+    <form class="row g-3" id="form" onsubmit="return salvarPessoa(event);">
+        <div class="input-group">
+            <div class="col-md-6">
+
+                <label>ID:</label> <input class="mb-3 form-control" type="number" name="id"  readonly>
+            </div>
+            <div class="col-md-6">
+
+                <label>assunto:</label> <input class="mb-3 form-control" type="text" name="assunto">
+            </div>
+            <div class="col-md-6">
+
+                <label>data:</label> <input class="mb-3 form-control" type="date" name="data">
+            </div>
+            <div class="col-md-6">
+                <label>cliente:</label> <input class="mb-3 form-control" type="text" name="cliente">
+                <input class="btn btn-success mb-1" type="submit" value="Salvar reunião">
+            </div>
+        </div>
+    </form>
+    <br>
+    <table class="table">
+        <thead>
+            <tr >
+                <th>ID</th>
+                <th>assunto</th>
+                <th>data</th>
+                <th>cliente</th>
+                <th colspan="2">Opções</th>
+            </tr>
+        </thead>
+        <tbody id="pessoas">
+        </tbody>
+    </table>
+    <script>
+        function editar(evt) {
+            let id = evt.currentTarget.paramId;
+            let tbody = document.getElementById("pessoas");
+            for (const tr of tbody.children) {
+                if (tr.children[0].innerHTML == id) {
+                    let id = document.getElementsByName("id")[0];
+                    let assunto = document.getElementsByName("assunto")[0];
+                    let data = document.getElementsByName("data")[0];
+                    let cliente = document.getElementsByName("cliente")[0];
+                    id.value = tr.children[0].innerHTML;
+                    assunto.value = tr.children[1].innerHTML;
+                    data.value = tr.children[2].innerHTML;
+                    cliente.value = tr.children[3].innerHTML;
+                }
+            }
+        }
+        function excluir(evt) {
+            let excluir = confirm("Tem certeza que deseja excluir?");
+            if (excluir == true) {
+                let id = evt.currentTarget.paramId;
+                fetch("excluir.php?id=" + id, {
+                    method: "GET",
+                    headers: { 'Content-type': "application/json; charset=UTF-8" }
+                })
+                    .then(response => response.json())
+                    .then(pessoa => excluirPessoa(pessoa))
+                    .catch(error => console.log(error));
+            }
+        }
+
+        function excluirPessoa(pessoa){
+            let tbody = document.getElementById("pessoas");
+            for (const tr of tbody.children) {
+                if (tr.children[0].innerHTML == pessoa.id) {
+                    tbody.removeChild(tr);
+                }
+            }
+        }
+
+
+        function salvarPessoa(event) {
+            event.preventDefault();
+            let form = document.getElementById("form");
+            let tbody = document.getElementById("pessoas");
+            let pessoa = Object.fromEntries(new FormData(form).entries());
+
+            if (pessoa.id == "") { //inserir nova pessoa
+                fetch("salvar.php", {
+                    method: "POST", //forma de envio
+                    body: JSON.stringify(pessoa), //informações a serem enviadas
+                    headers: { 'Content-type': "application/json; charset=UTF-8" }
+                })
+                    .then(response => response.json())//converte para json
+                    .then(pessoa => inserirPessoa(pessoa))
+                    .catch(error => console.log(error));
+            } else { //editar pessoa
+                fetch("salvar.php", {
+                    method: "PUT",
+                    body: JSON.stringify(pessoa),
+                    headers: { 'Content-type': "application/json; charset=UTF-8" }
+                })
+                    .then(response => response.json())
+                    .then(pessoa => alterarPessoa(pessoa))
+                    .catch(error => console.log(error));
+            }
+
+
+            form.reset();
+            return false;
+        }
+
+        function inserirPessoa(pessoa) {
+            let tr = document.createElement("tr");
+            let tdId = document.createElement("td");
+            tdId.innerText = pessoa.id;
+            let tdassunto = document.createElement("td");
+            tdassunto.innerText = pessoa.assunto;
+            let tddata = document.createElement("td");
+            tddata.innerText = pessoa.data;
+            let tdcliente = document.createElement("td");
+            tdcliente.innerText = pessoa.cliente;
+
+            let tdEditar = document.createElement("td");
+            let btnEditar = document.createElement("button");
+            btnEditar.addEventListener("click", editar, false);
+            btnEditar.paramId = pessoa.id;
+            btnEditar.innerHTML = "Editar";
+            tdEditar.appendChild(btnEditar);
+
+            let tdExcluir = document.createElement("td");
+            let btnExcluir = document.createElement("button");
+            btnExcluir.addEventListener("click", excluir, false);
+            btnExcluir.paramId = pessoa.id;
+            btnExcluir.innerHTML = "Excluir";
+            tdExcluir.appendChild(btnExcluir);
+
+            tr.appendChild(tdId);
+            tr.appendChild(tdassunto);
+            tr.appendChild(tddata);
+            tr.appendChild(tdcliente);
+            tr.appendChild(tdEditar);
+            tr.appendChild(tdExcluir);
+            let tBody = document.getElementById("pessoas");
+            tBody.appendChild(tr);
+        }
+
+
+
+        function alterarPessoa(pessoa) {
+            let tbody = document.getElementById("pessoas");
+            for (const tr of tbody.children) {
+                if (tr.children[0].innerHTML == pessoa.id) {
+                    tr.children[1].innerHTML = pessoa.assunto;
+                    tr.children[2].innerHTML = pessoa.data;
+                    tr.children[3].innerHTML = pessoa.cliente;
+                }
+            }
+        }
+
+        function listarTodos() {
+            fetch("listar.php", {
+                method: "GET",
+                headers: { 'Content-type': "application/json; charset=UTF-8" }
+            })
+                .then(response => response.json())
+                .then(pessoas => inserirPessoas(pessoas))
+                .catch(error => console.log(error));
+        }
+
+        function inserirPessoas(pessoas) {
+            for (const pessoa of pessoas) {
+                inserirPessoa(pessoa);
+            }
+        }
+        document.addEventListener("DOMContentLoaded", () => { listarTodos(); });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+
+</html>
