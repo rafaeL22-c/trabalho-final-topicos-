@@ -26,7 +26,7 @@ if ($resultado) {
                 $_SESSION['usuario'] = $usuario;
                 $_SESSION['permissao'] = $permissao;
                 $_SESSION['id'] = $idusuario; 
-                header("location:index-secretaria.php");
+                header("location:index-advogado.php");
                 exit();
             default:
                 header("location:index.php");
