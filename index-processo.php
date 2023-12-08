@@ -21,6 +21,52 @@ $resultado = mysqli_query($conexao, $sql);
     <title>Document</title>
 </head>
 <body>
+<?php if (isset($_SESSION['permissao']) && $_SESSION['permissao'] == 2) : ?>
+    <style>
+.navbar-nav .nav-link {
+    transition: color 0.3s; /* Transição suave da cor */
+}
+
+.navbar-nav .nav-link:hover {
+    border-bottom: 2px solid black;
+}
+  .cor-card{
+    background-color: black;
+  }
+  .botao-cor{
+    background-color: black;
+  }
+    </style>
+    <header>
+
+        <nav class="navbar navbar-expand-lg shadow p-3 bg-danger">
+            <div class="container-fluid">
+          <a class="navbar-brand " href="#">rp secretaria</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-center align-items-center" id="navbarNav">
+            <ul class="navbar-nav  d-flex justify-content-center align-items-center ">
+                <li class="nav-item  ">
+                    <a class="nav-link active " aria-current="page" href="index-clientes.php">clientes</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link active" href="index-reuniao.html">reuniões</a>
+                </li>
+              <li class="nav-item ">
+                <a class="nav-link active" href="index-processo.php">Processos</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link active" href="index.php">sair</a>
+            </li>   
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+<?php endif ?>
+
+      <?php if (isset($_SESSION['permissao']) && $_SESSION['permissao'] == 1) : ?>
 <style>
         .navbar-nav .nav-link {
     transition: color 0.3s; /* Transição suave da cor */
@@ -60,6 +106,7 @@ $resultado = mysqli_query($conexao, $sql);
 </div>
 </nav>
 </header>
+      <?php endif ?>
    
     <div class="row">
         <div class="col-md-12 ms-lg-auto m-3">
